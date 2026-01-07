@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tranquility - Wellness Soundscapes</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; overflow-x: hidden; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // Lucide React icons as SVG components
+        const Play = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+        );
+
+        const Pause = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+        );
+
+        const Heart = ({ size = 24, className = "", ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+        );
+
+        const Clock = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+        );
+
+        const Home = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        );
+
+        const Library = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <path d="m16 6 4 14"></path>
+                <path d="M12 6v14"></path>
+                <path d="M8 8v12"></path>
+                <path d="M4 4v16"></path>
+            </svg>
+        );
+
+        const Volume2 = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>
+        );
+
+        const X = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        );
+
+        const Repeat1 = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <path d="m17 2 4 4-4 4"></path>
+                <path d="M3 11v-1a4 4 0 0 1 4-4h14"></path>
+                <path d="m7 22-4-4 4-4"></path>
+                <path d="M21 13v1a4 4 0 0 1-4 4H3"></path>
+                <path d="M11 10h1v4"></path>
+            </svg>
+        );
+
+        const SkipForward = ({ size = 24, ...props }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+                <polygon points="5 4 15 12 5 20 5 4"></polygon>
+                <line x1="19" y1="5" x2="19" y2="19"></line>
+            </svg>
+        );
+
+        const SoundscapeApp = () => {
+            const soundscapes = [
+                {
+                    id: 0,
+                    title: "Test - Ambient Music",
+                    category: "Meditation",
+                    duration: "00:00",
+                    description: "Test audio to verify player functionality",
+                    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                    image: "🌊"
+                },
+                {
+                    id: 1,
+                    title: "Tranquility KSMX8",
+                    category: "Meditation",
+                    duration: "00:00",
+                    description: "Deep meditation soundscape for tranquility and inner peace",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AFZkpN9ZYlO29wPOaO8oViY/Tranquility%20KSMX8%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🧘"
+                },
+                {
+                    id: 2,
+                    title: "Tranquility Meditation KSMX4",
+                    category: "Meditation",
+                    duration: "00:00",
+                    description: "Peaceful meditation journey for mindfulness and relaxation",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AFAABAQzAfnS4Q4LbdviWK4/Tranquility%20Meditation%20KSMX4%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🕉️"
+                },
+                {
+                    id: 3,
+                    title: "Tranquility Nature KSMX3",
+                    category: "ADHD Focus",
+                    duration: "00:00",
+                    description: "Nature soundscape designed to enhance focus and concentration for ADHD",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AFDugP133g3iwA5ZQ2iDJWg/Tranquility%20Nature%20KSMX3%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🧠"
+                },
+                {
+                    id: 4,
+                    title: "Tranquility Noise KSMX2",
+                    category: "Focus",
+                    duration: "00:00",
+                    description: "Ambient noise soundscape for deep focus and productivity",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AG092Z497-DEuL1RkakQhGo/Tranquility%20Noise%20KSMX2%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🎯"
+                },
+                {
+                    id: 5,
+                    title: "Tranquility Rain KSMX1",
+                    category: "Meditation",
+                    duration: "00:00",
+                    description: "Gentle rain sounds for deep meditation and mindfulness",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/APDAvuF7VNfCXOGaWYnb6NQ/Tranquility%20Rain%20KSMX1%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🌧️"
+                },
+                {
+                    id: 6,
+                    title: "Tranquility Rain KSMX1",
+                    category: "Stress Relief",
+                    duration: "00:00",
+                    description: "Soothing rain to calm your mind and reduce stress",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/APDAvuF7VNfCXOGaWYnb6NQ/Tranquility%20Rain%20KSMX1%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "💧"
+                },
+                {
+                    id: 7,
+                    title: "Tranquility Rain KSMX1",
+                    category: "Sleep",
+                    duration: "00:00",
+                    description: "Peaceful rain sounds for restful, deep sleep",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/APDAvuF7VNfCXOGaWYnb6NQ/Tranquility%20Rain%20KSMX1%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "😴"
+                },
+                {
+                    id: 8,
+                    title: "Tranquility Soundbath KSMX2",
+                    category: "Meditation",
+                    duration: "00:00",
+                    description: "Immersive soundbath experience for deep meditation and spiritual connection",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AEaXQMoF6gfjL0iGsuao2eE/Tranquility%20Soundbath%20KSMX2%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🔔"
+                },
+                {
+                    id: 9,
+                    title: "Tranquility Soundbath KSMX2",
+                    category: "Sleep",
+                    duration: "00:00",
+                    description: "Calming soundbath frequencies to guide you into restful sleep",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AEaXQMoF6gfjL0iGsuao2eE/Tranquility%20Soundbath%20KSMX2%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🌙"
+                },
+                {
+                    id: 10,
+                    title: "Tranquility Soundbath KSMX2",
+                    category: "Focus",
+                    duration: "00:00",
+                    description: "Harmonic soundbath tones to enhance concentration and mental clarity",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AEaXQMoF6gfjL0iGsuao2eE/Tranquility%20Soundbath%20KSMX2%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "✨"
+                },
+                {
+                    id: 11,
+                    title: "Tranquility Spa KSMX3",
+                    category: "Meditation",
+                    duration: "00:00",
+                    description: "Serene spa ambience for peaceful meditation and mindfulness practice",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AEm2-mGajXG9D0-nH9-DmPE/Tranquility%20Spa%20KSMX3%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🌺"
+                },
+                {
+                    id: 12,
+                    title: "Tranquility Spa KSMX3",
+                    category: "Stress Relief",
+                    duration: "00:00",
+                    description: "Relaxing spa soundscape to melt away tension and anxiety",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AEm2-mGajXG9D0-nH9-DmPE/Tranquility%20Spa%20KSMX3%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "💆‍♀️"
+                },
+                {
+                    id: 13,
+                    title: "Tranquility Spa KSMX3",
+                    category: "Focus",
+                    duration: "00:00",
+                    description: "Tranquil spa atmosphere for calm, sustained concentration",
+                    audioUrl: "https://www.dropbox.com/scl/fo/kmazzqjps8sn4x97x7gtr/AEm2-mGajXG9D0-nH9-DmPE/Tranquility%20Spa%20KSMX3%20approved%20mix_mastered_STEREO.wav?rlkey=nfal6782vyvqfpi54tu2vr9db&dl=1",
+                    image: "🧖"
+                }
+            ];
+
+            const categories = ["All", "ADHD Focus", "Focus", "Meditation", "Sleep", "Stress Relief"];
+
+            const [currentView, setCurrentView] = useState('home');
+            const [selectedCategory, setSelectedCategory] = useState('All');
+            const [currentTrack, setCurrentTrack] = useState(null);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const [favorites, setFavorites] = useState(() => {
+                const saved = localStorage.getItem('favorites');
+                return saved ? JSON.parse(saved) : [];
+            });
+            const [showTimer, setShowTimer] = useState(false);
+            const [timerMinutes, setTimerMinutes] = useState(15);
+            const [volume, setVolume] = useState(0.7);
+            const [progress, setProgress] = useState(0);
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [isLooping, setIsLooping] = useState(false);
+            const [autoRotate, setAutoRotate] = useState(false);
+
+            const audioRef = useRef(null);
+            const timerRef = useRef(null);
+            const [duration, setDuration] = useState(0);
+            const [currentTime, setCurrentTime] = useState(0);
+
+            useEffect(() => {
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            }, [favorites]);
+
+            const toggleFavorite = (trackId) => {
+                setFavorites(prev =>
+                    prev.includes(trackId)
+                        ? prev.filter(id => id !== trackId)
+                        : [...prev, trackId]
+                );
+            };
+
+            const playTrack = (track) => {
+                setCurrentTrack(track);
+                setIsPlaying(true);
+                setProgress(0);
+                setError(null);
+                setIsLoading(true);
+            };
+
+            const togglePlay = () => {
+                if (error) {
+                    setError(null);
+                    setIsLoading(true);
+                }
+                setIsPlaying(!isPlaying);
+            };
+
+            const startTimer = () => {
+                setShowTimer(false);
+                if (timerRef.current) clearTimeout(timerRef.current);
+                timerRef.current = setTimeout(() => {
+                    setIsPlaying(false);
+                }, timerMinutes * 60 * 1000);
+            };
+
+            const filteredSoundscapes = selectedCategory === 'All'
+                ? soundscapes
+                : soundscapes.filter(s => s.category === selectedCategory);
+
+            const favoriteSoundscapes = soundscapes.filter(s => favorites.includes(s.id));
+
+            const formatTime = (seconds) => {
+                if (!seconds || isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            useEffect(() => {
+                if (audioRef.current) {
+                    if (isPlaying) {
+                        audioRef.current.play().catch(e => {
+                            console.error('Playback error:', e);
+                            setError(`Playback error: ${e.message}`);
+                            setIsPlaying(false);
+                        });
+                    } else {
+                        audioRef.current.pause();
+                    }
+                }
+            }, [isPlaying]);
+
+            useEffect(() => {
+                if (audioRef.current && currentTrack) {
+                    setIsLoading(true);
+                    setError(null);
+
+                    const audio = audioRef.current;
+                    audio.src = currentTrack.audioUrl;
+                    audio.volume = volume;
+                    audio.loop = isLooping;
+
+                    const handleCanPlay = () => {
+                        setIsLoading(false);
+                        setError(null);
+                        if (isPlaying) {
+                            audio.play().catch(e => {
+                                console.error('Playback error:', e);
+                                setError(`Playback error: ${e.message}`);
+                                setIsPlaying(false);
+                                setIsLoading(false);
+                            });
+                        }
+                    };
+
+                    const handleError = (e) => {
+                        console.error('Audio loading error:', e, audio.error);
+                        let errorMsg = 'Failed to load audio. ';
+                        if (audio.error) {
+                            switch (audio.error.code) {
+                                case 1: errorMsg += 'Loading aborted.'; break;
+                                case 2: errorMsg += 'Network error.'; break;
+                                case 3: errorMsg += 'Decoding failed.'; break;
+                                case 4: errorMsg += 'Audio format not supported.'; break;
+                                default: errorMsg += 'Unknown error.';
+                            }
+                        }
+                        setError(errorMsg);
+                        setIsLoading(false);
+                        setIsPlaying(false);
+                    };
+
+                    audio.addEventListener('canplay', handleCanPlay);
+                    audio.addEventListener('error', handleError);
+                    audio.load();
+
+                    return () => {
+                        audio.removeEventListener('canplay', handleCanPlay);
+                        audio.removeEventListener('error', handleError);
+                    };
+                }
+            }, [currentTrack]);
+
+            useEffect(() => {
+                if (audioRef.current) {
+                    audioRef.current.volume = volume;
+                    audioRef.current.loop = isLooping;
+                }
+            }, [volume, isLooping]);
+
+            useEffect(() => {
+                const audio = audioRef.current;
+                if (!audio) return;
+
+                const updateProgress = () => {
+                    setCurrentTime(audio.currentTime);
+                    if (audio.duration) {
+                        setProgress((audio.currentTime / audio.duration) * 100);
+                    }
+                };
+
+                const updateDuration = () => {
+                    setDuration(audio.duration);
+                };
+
+                const handleEnded = () => {
+                    if (autoRotate && !isLooping) {
+                        const currentIndex = soundscapes.findIndex(s => s.id === currentTrack.id);
+                        const nextIndex = (currentIndex + 1) % soundscapes.length;
+                        playTrack(soundscapes[nextIndex]);
+                    } else if (!isLooping) {
+                        setIsPlaying(false);
+                    }
+                };
+
+                audio.addEventListener('timeupdate', updateProgress);
+                audio.addEventListener('loadedmetadata', updateDuration);
+                audio.addEventListener('ended', handleEnded);
+
+                return () => {
+                    audio.removeEventListener('timeupdate', updateProgress);
+                    audio.removeEventListener('loadedmetadata', updateDuration);
+                    audio.removeEventListener('ended', handleEnded);
+                };
+            }, [currentTrack, autoRotate, isLooping]);
+
+            const CategoryCard = ({ icon, title, count }) => (
+                <div
+                    onClick={() => {
+                        setSelectedCategory(title);
+                        setCurrentView('library');
+                    }}
+                    className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-6 cursor-pointer hover:scale-105 transition-transform"
+                >
+                    <div className="text-4xl mb-3">{icon}</div>
+                    <h3 className="text-white font-semibold mb-1">{title}</h3>
+                    <p className="text-purple-200 text-sm">{count} soundscapes</p>
+                </div>
+            );
+
+            const SoundscapeCard = ({ soundscape }) => (
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-3">
+                    <div className="flex items-start justify-between">
+                        <div className="flex gap-3 flex-1">
+                            <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-blue-400 rounded-lg flex items-center justify-center text-2xl">
+                                {soundscape.image}
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="text-white font-medium mb-1">{soundscape.title}</h4>
+                                <p className="text-purple-200 text-sm mb-1">{soundscape.description}</p>
+                                <div className="flex gap-3 text-xs text-purple-300">
+                                    <span>{soundscape.category}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(soundscape.id);
+                            }}
+                            className="ml-2"
+                        >
+                            <Heart
+                                size={20}
+                                className={`${favorites.includes(soundscape.id) ? 'fill-pink-500 stroke-pink-500' : 'stroke-white'}`}
+                            />
+                        </button>
+                    </div>
+                    <button
+                        onClick={() => playTrack(soundscape)}
+                        className="mt-3 w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                    >
+                        Play Now
+                    </button>
+                </div>
+            );
+
+            const HomeView = () => (
+                <div className="p-5 pb-28">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+                        <p className="text-purple-200">Find your peace today</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-8">
+                        <CategoryCard icon="🧠" title="ADHD Focus" count={soundscapes.filter(s => s.category === "ADHD Focus").length} />
+                        <CategoryCard icon="🎯" title="Focus" count={soundscapes.filter(s => s.category === "Focus").length} />
+                        <CategoryCard icon="🧘" title="Meditation" count={soundscapes.filter(s => s.category === "Meditation").length} />
+                        <CategoryCard icon="😴" title="Sleep" count={soundscapes.filter(s => s.category === "Sleep").length} />
+                        <CategoryCard icon="💆" title="Stress Relief" count={soundscapes.filter(s => s.category === "Stress Relief").length} />
+                    </div>
+
+                    {favoriteSoundscapes.length > 0 && (
+                        <div>
+                            <h2 className="text-xl font-bold text-white mb-4">Your Favorites</h2>
+                            {favoriteSoundscapes.slice(0, 2).map(soundscape => (
+                                <SoundscapeCard key={soundscape.id} soundscape={soundscape} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            );
+
+            const LibraryView = () => (
+                <div className="p-5 pb-28">
+                    <h1 className="text-2xl font-bold text-white mb-4">Soundscapes</h1>
+
+                    <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                        {categories.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setSelectedCategory(cat)}
+                                className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${selectedCategory === cat
+                                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                                        : 'bg-white/10 text-purple-200 hover:bg-white/20'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div>
+                        {filteredSoundscapes.map(soundscape => (
+                            <SoundscapeCard key={soundscape.id} soundscape={soundscape} />
+                        ))}
+                    </div>
+                </div>
+            );
+
+            const FavoritesView = () => (
+                <div className="p-5 pb-28">
+                    <h1 className="text-2xl font-bold text-white mb-4">Favorites</h1>
+                    {favoriteSoundscapes.length === 0 ? (
+                        <div className="text-center py-12">
+                            <Heart size={48} className="text-purple-300 mx-auto mb-3" />
+                            <p className="text-purple-200">No favorites yet</p>
+                            <p className="text-purple-300 text-sm mt-2">Tap the heart icon to save soundscapes</p>
+                        </div>
+                    ) : (
+                        favoriteSoundscapes.map(soundscape => (
+                            <SoundscapeCard key={soundscape.id} soundscape={soundscape} />
+                        ))
+                    )}
+                </div>
+            );
+
+            const PlayerBar = () => {
+                if (!currentTrack) return null;
+
+                return (
+                    <div className="fixed bottom-20 left-0 right-0 bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg z-40">
+                        <div className="relative h-1 bg-white/20">
+                            <div
+                                className="absolute h-full bg-white transition-all duration-300"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                        <div className="p-4">
+                            {error && (
+                                <div className="bg-red-500/20 text-white text-xs p-2 rounded mb-2 border border-red-500/30">
+                                    <div className="font-semibold mb-1">⚠️ Error</div>
+                                    <div>{error}</div>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex-1">
+                                    <h4 className="text-white font-medium text-sm">{currentTrack.title}</h4>
+                                    <p className="text-purple-100 text-xs">
+                                        {isLoading ? 'Loading...' : currentTrack.category}
+                                    </p>
+                                </div>
+                                <button onClick={() => toggleFavorite(currentTrack.id)}>
+                                    <Heart
+                                        size={20}
+                                        className={`${favorites.includes(currentTrack.id) ? 'fill-white stroke-white' : 'stroke-white'}`}
+                                    />
+                                </button>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-purple-100 mb-2">
+                                <span>{formatTime(currentTime)}</span>
+                                <span>{formatTime(duration)}</span>
+                            </div>
+                            <div className="flex items-center justify-center gap-3 mb-3 text-xs text-purple-100">
+                                <button
+                                    onClick={() => setIsLooping(!isLooping)}
+                                    className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${isLooping ? 'bg-white/30' : 'hover:bg-white/10'}`}
+                                    title="Repeat current track"
+                                >
+                                    <Repeat1 size={14} />
+                                    <span className="text-xs">Loop</span>
+                                </button>
+                                <button
+                                    onClick={() => setAutoRotate(!autoRotate)}
+                                    className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${autoRotate ? 'bg-white/30' : 'hover:bg-white/10'}`}
+                                    title="Auto-play next track"
+                                >
+                                    <SkipForward size={14} />
+                                    <span className="text-xs">Auto</span>
+                                </button>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <button
+                                    onClick={() => setShowTimer(true)}
+                                    className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+                                    disabled={isLoading}
+                                >
+                                    <Clock size={20} />
+                                </button>
+                                <button
+                                    onClick={togglePlay}
+                                    className="bg-white text-purple-600 rounded-full p-3 hover:scale-110 transition-transform disabled:opacity-50"
+                                    disabled={isLoading && !error}
+                                >
+                                    {isLoading && !error ? (
+                                        <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                                    ) : isPlaying ? (
+                                        <Pause size={24} />
+                                    ) : (
+                                        <Play size={24} />
+                                    )}
+                                </button>
+                                <div className="flex items-center gap-2">
+                                    <Volume2 size={20} className="text-white" />
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="1"
+                                        step="0.1"
+                                        value={volume}
+                                        onChange={(e) => setVolume(parseFloat(e.target.value))}
+                                        className="w-16"
+                                        disabled={isLoading}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const TimerModal = () => {
+                if (!showTimer) return null;
+
+                return (
+                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-5">
+                        <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-6 w-full max-w-sm">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-white">Set Timer</h3>
+                                <button onClick={() => setShowTimer(false)}>
+                                    <X className="text-white" size={24} />
+                                </button>
+                            </div>
+                            <div className="text-center mb-6">
+                                <div className="text-6xl font-bold text-white mb-2">{timerMinutes}</div>
+                                <div className="text-purple-200">minutes</div>
+                            </div>
+                            <input
+                                type="range"
+                                min="5"
+                                max="120"
+                                step="5"
+                                value={timerMinutes}
+                                onChange={(e) => setTimerMinutes(parseInt(e.target.value))}
+                                className="w-full mb-6"
+                            />
+                            <button
+                                onClick={startTimer}
+                                className="w-full bg-white text-purple-600 py-3 rounded-xl font-semibold hover:bg-opacity-90 transition-opacity"
+                            >
+                                Start Timer
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            const BottomNav = () => (
+                <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-purple-900/95 to-blue-900/95 backdrop-blur-lg border-t border-white/10 z-50">
+                    <div className="flex justify-around py-3">
+                        <button
+                            onClick={() => setCurrentView('home')}
+                            className={`flex flex-col items-center gap-1 ${currentView === 'home' ? 'text-white' : 'text-purple-300'}`}
+                        >
+                            <Home size={24} />
+                            <span className="text-xs">Home</span>
+                        </button>
+                        <button
+                            onClick={() => setCurrentView('library')}
+                            className={`flex flex-col items-center gap-1 ${currentView === 'library' ? 'text-white' : 'text-purple-300'}`}
+                        >
+                            <Library size={24} />
+                            <span className="text-xs">Library</span>
+                        </button>
+                        <button
+                            onClick={() => setCurrentView('favorites')}
+                            className={`flex flex-col items-center gap-1 ${currentView === 'favorites' ? 'text-white' : 'text-purple-300'}`}
+                        >
+                            <Heart size={24} />
+                            <span className="text-xs">Favorites</span>
+                        </button>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
+                    <audio ref={audioRef} preload="metadata" crossOrigin="anonymous" />
+
+                    {currentView === 'home' && <HomeView />}
+                    {currentView === 'library' && <LibraryView />}
+                    {currentView === 'favorites' && <FavoritesView />}
+
+                    <PlayerBar />
+                    <TimerModal />
+                    <BottomNav />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<SoundscapeApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
